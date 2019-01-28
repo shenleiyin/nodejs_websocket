@@ -1,0 +1,26 @@
+
+user  就是进来的那个人
+io.on('connection',(user)=>{
+	
+})
+
+
+
+前台-》 后台
+emit(key,value)
+
+on(key,(str=>{
+	
+}))
+后台-》 前台
+emit(key,value)
+
+on(key,(str=>{
+	
+}))
+
+
+
+broadcast -> (除了自己给别人发  给剩下在线的人发送消息)
+
+disconnect  -> (下线了，通知所有人)

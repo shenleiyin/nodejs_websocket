@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script type="text/javascript" src="http://localhost:1212/socket.io/socket.io.js"></script>
+	<style>
+		*{margin: 0;padding: 0;list-style: none;}
+		.textNode{width: 400px;height: 300px;border: 1px solid black;position: absolute;left: 50%;top: -1px;margin-left: -200px;overflow: auto;}
+		#txtNode{width: 400px;height: 100px;position: absolute;left: 50%;top: 300px;margin-left: -200px;}
+		#btn{width: 400px;height: 50px;position: absolute;left: 50%;top: 400px;margin-left: -200px;}
+		.useNode{width: 100px;height: 450px;border: 1px solid black;position: absolute;left:calc(50% + 250px);top: -1px;margin-left: -50px;}
+
+		#userName{width: 100%;height: 100%;position: fixed;background: black;z-index: 5;transition: .7s;}
+		#userName p{text-align: center;font-size: 35px;color: white;margin-top: 30px;}
+		#userName input{width: 400px;height: 100px;position: absolute;left: 50%;top: 50%;margin-left: -200px;top: 200px;font-size: 40px;}
+		#btnsure{width: 400px;height: 100px;position: absolute;left: 50%;top: 50%;margin-left: -200px;top: 350px;font-size: 40px;}
+
+		ul li{text-indent: 10px;border-bottom: 1px dashed black;}
+		ol li{text-indent: 10px;border-bottom: 1px dashed black;}
+		ul li.my > p:nth-child(1){
+			color: #ccc;
+			text-align: right;
+		}
+		ul li.my > p:nth-child(2){
+			color: #ccc;
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+	<div id="userName">
+		<p>请输入名字</p>
+		<input type="text" id="userInput">
+		<button id="btnsure">确定</button>
+	</div>
+	<div class="textNode" id="textNode">
+		<ul id="ul">
+			<!-- <li>
+				<p>shen 12:12:2</p>
+				<p>shenleiyin</p>
+			</li> -->
+		</ul>
+	</div>
+	<div class="useNode">
+		<ol id="ol">
+			
+		</ol>
+	</div>
+	<textarea id="txtNode" style="resize: none;"></textarea>
+	<button id="btn">发送消息</button>
+
+
+	<script type="text/javascript">
+		function toLi(user,timer,inner,classPool='mo'){
+			var oLi = document.createElement('li');
+			oLi.className = classPool;
+			oLi.innerHTML = `
+				<p>${user}  ${timer}</p>
+				<p>${inner}</p>
+			`;
+			return oLi;
+		}
+
+
+		btnsure.onclick=function(){ 
+			window.conn = io.connect('ws://localhost:1212');
+			userName.style.transform='translateY(-100%)';
+			conn.emit('name',userInput.value);
+
+			conn.on('allmsg',(arr)=>{
+				for(var i=0;i<arr.length;i++){
+					ul.appendChild(toLi(arr.userName,arr.timer,arr.msg));
+				}
+				textNode.scrollTop = textNode.scrollHeight - 300;
+			})
+
+			conn.on('msg',(json)=>{
+				// console.log(json);
+				ul.appendChild(toLi(json.userName,json.timer,json.msg));
+				textNode.scrollTop = textNode.scrollHeight - 300;
+			});
+			conn.on('mymsg',(json)=>{
+				ul.appendChild(toLi(json.userName,json.timer,json.msg,'my'));
+				textNode.scrollTop = textNode.scrollHeight - 300;
+			})
+
+			conn.on('userup',(str)=>{
+				// console.log(str);
+				for(var i=0;i<ol.children.innerHTML.length;i++){
+					if(ol.children[i].innerHTML==str){
+						ol.children[i].remove();
+					}
+				}
+			})
+			conn.on('user',(arr)=>{
+				ol.innerHTML='';
+				for(var i=0;i < arr.length;i++){
+					var oLi = document.createElement('li');
+					oLi.innerHTML = arr[i];
+					ol.appendChild(oLi);
+				}
+				
+			})
+		};
+		btn.onclick=function(){
+			conn.emit('msg',txtNode.value);
+
+		}
+	</script>
+</body>
+</html>

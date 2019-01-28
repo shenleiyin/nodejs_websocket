@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script type="text/javascript" src="http://localhost:1212/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		let connection = io.connect('ws://localhost:1212');
+
+		connection.emit('bbb','hello socket');
+		/*connection.on('aaa',(str)=>{
+			console.log(str);
+		})*/
+	</script>
+</head>
+<body>
+	
+</body>
+</html>
